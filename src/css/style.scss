@@ -1,0 +1,26 @@
+//// Dependencies
+@import '../components/button/button';
+@import '../components/chat/chat';
+@import '../components/messages/messages';
+@import '../components/message/message';
+
+body {
+
+  font-size: 12pt;
+  font-family: "Ethica Book";
+
+  .row {
+    display: flex;
+    align-items: center;
+
+    .btn {
+      margin-left: 5px;
+    }
+
+    input {
+      background-color: white;
+      padding-left:4px;
+    }
+  }
+}
+
