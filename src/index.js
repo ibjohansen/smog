@@ -1,110 +1,55 @@
 import React, { Component, PropTypes } from 'react';
 import { render } from 'react-dom';
-import Chat from './components/chat';
-import Messages from './components/messages';
-import Message from './components/message';
-import Button from './components/button';
 import Username from './logic/username';
-import {ACTION_INIT, ACTION_MESSAGE} from './consts';
 import _ from 'lodash';
-
-const appContainer = document.getElementById('app');
-const channelId = appContainer.getAttribute('data-channel');
-const userId = appContainer.getAttribute('data-user-id');
-const username = appContainer.getAttribute('data-user-name');
-
-let ws;
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
       username: '',
-      messages: [],
-      inputMessage: ''
-    }
+      geolocation: '',
+      stationdata: 'data ikke tilgjengelig, trykk hent data'
+  }
   }
 
   componentWillMount() {
-    const storedName = sessionStorage.getItem('emb-chat-username');
+    const storedName = sessionStorage.getItem('smog-username');
     if (storedName) {
       this.setState({username: storedName});
-      this.initSockets(storedName);
     } else {
+      Username()
+        .then((value) => {
+            const username = value.data;
+            sessionStorage.setItem('smog-username', username);
+            this.setState({username});
+          },
+          (reason) => {
+            console.log(reason);
+          })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
 
-      if (this.props.username) {
+    this.getLocation().then((response) => {
+      this.setState({geolocation: response});
+    }, (error) => {
+      alert(error.message)
+    });
+  }
 
-        //todo set userid & username from props in a better way
-
-        this.setState({username: this.props.username});
-        this.setState({userId: this.props.username});
-        this.initSockets(this.props.username);
+  getLocation() {
+    return new Promise(function (resolve, reject) {
+      if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+          resolve(position);
+        });
       } else {
-        Username()
-          .then((value) => {
-              const username = value.data;
-              sessionStorage.setItem('emb-chat-username', username);
-              this.setState({username});
-              this.initSockets(username);
-            },
-            (reason) => {
-              console.log(reason);
-            })
-          .catch((error) => {
-            console.log(error);
-          });
+        reject(new Error('geolocation is not available'));
       }
-    }
-  }
-
-  // TODO: Remove username as it's set by component?
-  initSockets(username) {
-    var host = "localhost:8080";
-    ws = new WebSocket("ws://" + host + "/echo");
-
-    ws.onopen = () => {
-      var message = {
-        channel: this.props.channel,
-        userId: this.props.userId,
-        name: this.state.username,
-        action: ACTION_INIT
-      };
-      ws.send(JSON.stringify(message));
-    };
-
-    ws.onmessage = (e) => {
-      addMessage(JSON.parse(e.data));
-    };
-
-    const addMessage = (msg, type) => {
-      let messageArray = this.state.messages;
-      if (msg.log && msg.log.length > 0) {
-        for (var i = 0; i < msg.log.length; i++) {
-          messageArray.push(msg.log[i]);
-        }
-      }
-
-      messageArray.push(msg);
-      this.setState({messages: messageArray})
-    }
-  }
-
-  sendMessage() {
-    if (!this.state.inputMessage) {
-      return;
-    }
-
-    var messageData = {
-      channel: this.props.channel,
-      userId: this.state.userId,
-      name: this.state.username,
-      message: this.state.inputMessage,
-      action: ACTION_MESSAGE
-    };
-    var stringData = JSON.stringify(messageData);
-    ws.send(stringData);
-    this.handleValueChange('inputMessage', '')
-  }
+    });
+  };
 
   handleValueChangeFromInput(key, e) {
     this.handleValueChange(key, e.target.value)
@@ -124,11 +69,25 @@ class App extends Component {
 
 
   render() {
+
+    const username = this.state.username;
+    const loc = this.state.geolocation;
+    const lat = loc.latitude;
+    const long = loc.longitude;
+    const url = `http://localhost:5555/${lat}/${long}`;
+    const stationdata = this.state.stationdata;
+
     return (
-      <div>helløu smog</div>
+      <div>
+        <span>Velkommen til smog {username}</span><br/>
+        <span>lokasjon-lat: {lat}</span><br/>
+        <span>lokasjon-long: {long}</span><br/>
+        <span><a href={url}>hent data</a></span><br/>
+        <span>{stationdata}</span>
+      </div>
     )
   }
 }
 
-render(<App channel={channelId} userId={userId} username={username}/>, appContainer);
+render(<App />, document.getElementById('app'));
 
