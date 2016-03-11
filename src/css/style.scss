@@ -3,6 +3,7 @@
 @import '../components/chat/chat';
 @import '../components/messages/messages';
 @import '../components/message/message';
+@import '../components/loader/loader.scss';
 
 body {
 
@@ -22,5 +23,7 @@ body {
       padding-left:4px;
     }
   }
+
+
 }
 

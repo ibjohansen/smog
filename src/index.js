@@ -2,15 +2,20 @@ import React, { Component, PropTypes } from 'react';
 import { render } from 'react-dom';
 import Username from './logic/username';
 import _ from 'lodash';
+import request from 'superagent';
+import Loader from './components/loader';
 
 class App extends Component {
   constructor(props) {
     super(props);
+
+    this.handleGetLocationData = this.handleGetLocationData.bind(this);
+
     this.state = {
       username: '',
-      geolocation: '',
+      geolocation: null,
       stationdata: 'data ikke tilgjengelig, trykk hent data'
-  }
+    }
   }
 
   componentWillMount() {
@@ -39,6 +44,7 @@ class App extends Component {
     });
   }
 
+
   getLocation() {
     return new Promise(function (resolve, reject) {
       if ("geolocation" in navigator) {
@@ -48,6 +54,24 @@ class App extends Component {
       } else {
         reject(new Error('geolocation is not available'));
       }
+    });
+  };
+
+  handleGetLocationData() {
+    return new Promise((resolve, reject) => {
+      const loc = this.state.geolocation;
+      const lat = loc.coords.latitude;
+      const long = loc.coords.longitude;
+      const url = `http://localhost:5555/stationdata/${lat}/${long}`;
+
+      request
+        .get(url)
+        .end((err, res) => {
+          console.log('---------------------------------->');
+          console.log(res.body);
+          console.log('<----------------------------------');
+          this.setState({stationdata: res.body})
+        });
     });
   };
 
@@ -69,25 +93,36 @@ class App extends Component {
 
 
   render() {
-
     const username = this.state.username;
-    const loc = this.state.geolocation;
-    const lat = loc.latitude;
-    const long = loc.longitude;
-    const url = `http://localhost:5555/${lat}/${long}`;
-    const stationdata = this.state.stationdata;
+    const geolocation = this.state.geolocation;
 
-    return (
-      <div>
-        <span>Velkommen til smog {username}</span><br/>
-        <span>lokasjon-lat: {lat}</span><br/>
-        <span>lokasjon-long: {long}</span><br/>
-        <span><a href={url}>hent data</a></span><br/>
-        <span>{stationdata}</span>
-      </div>
-    )
+    if (null !== geolocation) {
+      const lat = geolocation.coords.latitude;
+      const long = geolocation.coords.longitude;
+      const stationdata = this.state.stationdata || {};
+      return (
+        <div>
+          <span>Velkommen til smog {username}</span><br/>
+          <span>lokasjon-lat: {lat}</span><br/>
+          <span>lokasjon-long: {long}</span><br/>
+          <button type="button" onClick={this.handleGetLocationData}>hent data</button>
+          <br/>
+          <span>{JSON.stringify(stationdata)}</span><br/>
+        </div>
+      )
+    } else {
+      return (
+        <Loader/>
+      )
+    }
   }
 }
 
 render(<App />, document.getElementById('app'));
 
+/*
+
+ <span>{stationdata.TimeSeries[0].Measurements[0].Value}</span><br/>
+
+
+ */
