@@ -20,7 +20,9 @@ const pollutionLevels = {
     {
       levelStart: 0,
       levelEnd: 99,
+      description: 'Nitrogendioksid',
       title: 'Lite',
+      health: 'Liten eller ingen helserisiko',
       color: 'green',
       icon: 'sentiment_satisfied'
     },
@@ -29,6 +31,7 @@ const pollutionLevels = {
       levelEnd: 199,
       description: 'Nitrogendioksid',
       title: 'Moderat',
+      health: 'Moderat helserisiko',
       color: 'yellow',
       icon: 'sentiment_neutral'
     },
@@ -38,6 +41,7 @@ const pollutionLevels = {
       levelEnd: 399,
       description: 'Nitrogendioksid',
       title: 'Høyt',
+      health: 'Betydelig helserisiko',
       color: 'orange',
       icon: 'sentiment_dissatisfied'
     },
@@ -47,6 +51,89 @@ const pollutionLevels = {
       levelEnd: 1000,
       description: 'Nitrogendioksid',
       title: 'Svært høyt',
+      health: 'Alvorlig helserisiko',
+      color: 'red',
+      icon: 'sentiment_very_dissatisfied'
+    }
+  ],
+
+  "PM2.5": [
+    {
+      levelStart: 0,
+      levelEnd: 24,
+      description: 'Svevestøv/partikler',
+      title: 'Lite',
+      health: 'Liten eller ingen helserisiko',
+      color: 'green',
+      icon: 'sentiment_satisfied'
+    },
+    {
+      levelStart: 25,
+      levelEnd: 39,
+      description: 'Svevestøv/partikler',
+      title: 'Moderat',
+      health: 'Moderat helserisiko',
+      color: 'yellow',
+      icon: 'sentiment_neutral'
+    },
+
+    {
+      levelStart: 40,
+      levelEnd: 149,
+      description: 'Svevestøv/partikler',
+      title: 'Høyt',
+      health: 'Betydelig helserisiko',
+      color: 'orange',
+      icon: 'sentiment_dissatisfied'
+    },
+
+    {
+      levelStart: 150,
+      levelEnd: 1000,
+      description: 'Svevestøv/partikler',
+      title: 'Svært høyt',
+      health: 'Alvorlig helserisiko',
+      color: 'red',
+      icon: 'sentiment_very_dissatisfied'
+    }
+  ],
+
+  PM10: [
+    {
+      levelStart: 0,
+      levelEnd: 24,
+      description: 'Svevestøv/partikler',
+      title: 'Lite',
+      health: 'Liten eller ingen helserisiko',
+      color: 'green',
+      icon: 'sentiment_satisfied'
+    },
+    {
+      levelStart: 25,
+      levelEnd: 39,
+      description: 'Svevestøv/partikler',
+      title: 'Moderat',
+      health: 'Moderat helserisiko',
+      color: 'yellow',
+      icon: 'sentiment_neutral'
+    },
+
+    {
+      levelStart: 40,
+      levelEnd: 149,
+      description: 'Svevestøv/partikler',
+      title: 'Høyt',
+      health: 'Betydelig helserisiko',
+      color: 'orange',
+      icon: 'sentiment_dissatisfied'
+    },
+
+    {
+      levelStart: 150,
+      levelEnd: 1000,
+      description: 'Svevestøv/partikler',
+      title: 'Svært høyt',
+      health: 'Alvorlig helserisiko',
       color: 'red',
       icon: 'sentiment_very_dissatisfied'
     }
@@ -60,6 +147,7 @@ class App extends Component {
 
     this.handleGetLocationData = this.handleGetLocationData.bind(this);
     this.onSelectStation = this.onSelectStation.bind(this);
+    this.handleSetType = this.handleSetType.bind(this);
 
     this.state = {
       username: '',
@@ -123,6 +211,11 @@ class App extends Component {
     }
   }
 
+  handleSetType(e) {
+    const type = e.target.getAttribute('data-type');
+    this.setState({type});
+  }
+
   renderIcon(iconString) {
     return (
       <i className="material-icons md-48 md-light">{iconString}</i>
@@ -176,16 +269,33 @@ class App extends Component {
       return (
         <div className="row">
           <Menu onSelectStation={this.onSelectStation}/>;
-          <div>smog</div>
-          <div>luftforurensningsnivået der du er!</div>
+          <div className="app-name">smog</div>
+          <div className="app-splash">luftforurensningsnivået der du er!</div>
+          <br/>
           <div className="location-name">{name} - {dateTimeTo}</div>
-          <Gauge name={name} value={airComponentValue} trend={airComponentTrend}/>
+          <Gauge name={name} value={airComponentValue} max={airComponentMax} trend={airComponentTrend}/>
           <br/>
           <div>{airComponentDescription}: {Math.round(airComponentValue)} {airComponentUnit} ({trendText()})</div>
           <br/>
           <div>maxverdi: {airComponentMax}</div>
 
           {this.renderIcon(levelObject[0].icon)}
+
+          <br/>
+          <div className="btn-bar">
+
+            <div className="button raised" disabled={type==='NO2'} onClick={this.handleSetType} data-type="NO2">
+              <div className="center">NO2</div>
+            </div>
+
+            <div className="button raised" disabled={type==='PM2.5'} onClick={this.handleSetType} data-type="PM2.5">
+              <div className="center">PM2,5</div>
+            </div>
+
+            <div className="button raised" disabled={type==='PM10'} onClick={this.handleSetType} data-type="PM10">
+              <div className="center">PM10</div>
+            </div>
+          </div>
 
         </div>
       )
@@ -194,6 +304,12 @@ class App extends Component {
         <Loader/>
       )
     }
+  }
+
+  renderLoaderOnly() {
+    return (
+      <Loader/>
+    )
   }
 
   render() {
@@ -206,6 +322,7 @@ class App extends Component {
       )
     }
   }
+
 }
 
 render(

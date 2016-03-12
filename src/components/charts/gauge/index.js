@@ -5,18 +5,20 @@ class Gauge extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      percentage: 0
+      percentage: 0,
+      max: this.props.max
     };
   }
 
   componentDidMount() {
-    const {value} = this.props;
-    const percentage = value * (100 / 400);
-    setTimeout(() => {
-      this.setState({percentage})
-    }, 500);
-  }
+    const {value } = this.props;
+    const percentage = (value * 100) / this.state.max;
+    const percentageOfHalfcircle = (percentage * 180) / 100;
 
+    setTimeout(() => {
+      this.setState({percentage: percentageOfHalfcircle})
+    }, 750);
+  }
 
   renderTrendIcon() {
     const trend = this.props.trend;
