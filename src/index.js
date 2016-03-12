@@ -231,6 +231,10 @@ class App extends Component {
         return data.type === type
       });
 
+      console.log('-selectedData)--------------------------------->');
+      console.log(selectedData);
+      console.log('<----------------------------------');
+
       moment.locale('nb');
       const name = stationdata.name;
       const airComponentUnit = selectedData[0].unit;
