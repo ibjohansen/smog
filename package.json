@@ -51,7 +51,7 @@
     "express": "^4.13.3",
     "http-static-gzip-regexp": "0.0.2",
     "lodash": "^4.6.1",
-    "moment": "^2.11.2",
+    "moment": "^2.12.0",
     "superagent": "^1.8.0"
   }
 }

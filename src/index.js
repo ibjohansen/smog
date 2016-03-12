@@ -4,6 +4,7 @@ import Username from './logic/username';
 import _ from 'lodash';
 import request from 'superagent';
 import Loader from './components/loader';
+import moment from 'moment';
 
 class App extends Component {
   constructor(props) {
@@ -14,7 +15,7 @@ class App extends Component {
     this.state = {
       username: '',
       geolocation: null,
-      stationdata: 'data ikke tilgjengelig, trykk hent data'
+      stationdata: null //'data ikke tilgjengelig, trykk hent data'
     }
   }
 
@@ -39,6 +40,7 @@ class App extends Component {
 
     this.getLocation().then((response) => {
       this.setState({geolocation: response});
+      this.handleGetLocationData();
     }, (error) => {
       alert(error.message)
     });
@@ -67,28 +69,62 @@ class App extends Component {
       request
         .get(url)
         .end((err, res) => {
-          console.log('---------------------------------->');
-          console.log(res.body);
-          console.log('<----------------------------------');
           this.setState({stationdata: res.body})
+
         });
     });
   };
 
-  handleValueChangeFromInput(key, e) {
-    this.handleValueChange(key, e.target.value)
-  }
+  //handleValueChangeFromInput(key, e) {
+  //  this.handleValueChange(key, e.target.value)
+  //}
+  //
+  //handleValueChange(key, value) {
+  //  const state = this.state;
+  //  _.set(state, key, value);
+  //  this.setState(state)
+  //}
+  //
+  //handleUrlKeyPress(e) {
+  //  if (e.charCode === 13 && e.target.value) {
+  //    this.sendMessage();
+  //  }
+  //}
 
-  handleValueChange(key, value) {
-    const state = this.state;
-    _.set(state, key, value);
-    this.setState(state)
-  }
+  renderData() {
+    moment.locale('nb');
+    const stationdata = this.state.stationdata;
+console.log('---------------------------------->');
+console.log(stationdata);
+console.log('<----------------------------------');
 
-  handleUrlKeyPress(e) {
-    if (e.charCode === 13 && e.target.value) {
-      this.sendMessage();
+    if (null !== stationdata) {
+
+      const name = stationdata[0].Name;
+      const airCcomponent = stationdata[0].TimeSeries[0].Component;
+      const dataType = stationdata[0].TimeSeries[0].DataType;
+      const airComponentValue = stationdata[0].TimeSeries[0].Measurments[0].Value;
+      const dateTimeFrom = moment(stationdata[0].TimeSeries[0].Measurments[0].DateTimeFrom).format();
+      const dateTimeTo = moment(stationdata[0].TimeSeries[0].Measurments[0].DateTimeTo).format();
+      console.log(dateTimeFrom);
+      return (
+        <div>
+          <span>Målestasjon {name}</span>
+          <br/>
+          <span>Luftkomponent {airCcomponent}</span>
+          <br/>
+          <span>Type {dataType}</span>
+          <br/>
+          <span>Verdi {airComponentValue}</span>
+          <span>Tidsrom {dateTimeFrom} {dateTimeTo}</span>
+        </div>
+      )
+    } else {
+      return (
+        <span>ikkeno her</span>
+      )
     }
+
   }
 
 
@@ -99,17 +135,19 @@ class App extends Component {
     if (null !== geolocation) {
       const lat = geolocation.coords.latitude;
       const long = geolocation.coords.longitude;
-      const stationdata = this.state.stationdata || {};
-      return (
-        <div>
-          <span>Velkommen til smog {username}</span><br/>
-          <span>lokasjon-lat: {lat}</span><br/>
-          <span>lokasjon-long: {long}</span><br/>
-          <button type="button" onClick={this.handleGetLocationData}>hent data</button>
-          <br/>
-          <span>{JSON.stringify(stationdata)}</span><br/>
-        </div>
-      )
+
+      if (null !== this.state.geolocation) {
+
+        return (
+          <div>
+            <span>Velkommen til smog {username}</span><br/>
+            <span>lokasjon-lat: {lat}</span><br/>
+            <span>lokasjon-long: {long}</span><br/>
+            <br/>
+            {this.renderData()}
+          </div>
+        )
+      }
     } else {
       return (
         <Loader/>
@@ -123,6 +161,10 @@ render(<App />, document.getElementById('app'));
 /*
 
  <span>{stationdata.TimeSeries[0].Measurements[0].Value}</span><br/>
+ <span>{airCcomponent}</span>
+ <span>{dataType}</span>
+ &nbsp;
+ <span>{airComponentValue}</span>
 
 
  */
