@@ -1,11 +1,24 @@
 //// Dependencies
-@import '../components/button/button';
-@import '../components/chat/chat';
-@import '../components/messages/messages';
-@import '../components/message/message';
 @import '../components/loader/loader.scss';
+@import '../components/charts/gauge/gauge.scss';
 
 body {
+
+  &.green {
+    background-color: green;
+  }
+
+  &.yellow {
+    background-color: yellow;
+  }
+
+  &.orange {
+    background-color: orange;
+  }
+
+  &.red {
+    background-color: red;
+  }
 
   font-size: 12pt;
   font-family: "Ethica Book";
@@ -13,17 +26,6 @@ body {
   .row {
     display: flex;
     align-items: center;
-
-    .btn {
-      margin-left: 5px;
-    }
-
-    input {
-      background-color: white;
-      padding-left:4px;
-    }
   }
-
-
 }
 
