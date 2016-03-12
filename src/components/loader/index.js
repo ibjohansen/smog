@@ -3,8 +3,13 @@ class Loader extends Component {
 
   render() {
     return (
-      <div id="loader">
-        <div id="escapingBall_1" className="loader"></div>
+      <div className="la-pacman la-3x">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
       </div>
     );
   }

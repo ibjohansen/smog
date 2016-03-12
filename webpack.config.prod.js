@@ -2,7 +2,6 @@ var webpack = require('webpack');
 var path = require('path');
 var isProd = process.env.NODE_ENV === 'production';
 var CompressionPlugin = require("compression-webpack-plugin");
-var SvgStore = require('webpack-svgstore-plugin');
 
 var plugins = [
   new webpack.DefinePlugin({

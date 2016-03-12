@@ -6,37 +6,52 @@ import Loader from './components/loader';
 import moment from 'moment';
 import Gauge from './components/charts/gauge';
 
+//const MAP_API_KEY = 'AIzaSyAoJnCZd4rGip98-aGDRX0prads8v3R9Qw';
+
 const pollutionLevels = {
-  NO2: [{
-    levelStart: 0,
-    levelEnd: 99,
-    title: 'Lite',
-    color: 'green'
+  descriptions: {
+    NO2: {
+      title: 'Nitrogendioksid',
+      max: '400'
+    }
   },
+  NO2: [
+    {
+      levelStart: 0,
+      levelEnd: 99,
+      title: 'Lite',
+      color: 'green',
+      icon: 'sentiment_satisfied'
+    },
     {
       levelStart: 100,
       levelEnd: 199,
+      description: 'Nitrogendioksid',
       title: 'Moderat',
-      color: 'yellow'
+      color: 'yellow',
+      icon: 'sentiment_neutral'
     },
 
     {
       levelStart: 200,
       levelEnd: 399,
+      description: 'Nitrogendioksid',
       title: 'Høyt',
-      color: 'orange'
+      color: 'orange',
+      icon: 'sentiment_dissatisfied'
     },
 
     {
       levelStart: 400,
       levelEnd: 1000,
+      description: 'Nitrogendioksid',
       title: 'Svært høyt',
-      color: 'red'
+      color: 'red',
+      icon: 'sentiment_very_dissatisfied'
     }
   ]
 };
 
-const MAP_API_KEY = 'AIzaSyAoJnCZd4rGip98-aGDRX0prads8v3R9Qw';
 
 class App extends Component {
   constructor(props) {
@@ -47,7 +62,8 @@ class App extends Component {
     this.state = {
       username: '',
       geolocation: null,
-      stationdata: null
+      stationdata: null,
+      type: 'NO2'
     }
   }
 
@@ -84,10 +100,7 @@ class App extends Component {
           this.setState({stationdata: res.body})
 
         }, (err)=> {
-          console.log('---------------------------------->');
-          console.log('err');
           console.log(err);
-          console.log('<----------------------------------');
         });
     });
   };
@@ -108,60 +121,72 @@ class App extends Component {
     }
   }
 
+  renderIcon(iconString) {
+    return (
+      <i className="material-icons md-48 md-light">{iconString}</i>
+    )
+  }
+
   renderData() {
     moment.locale('nb');
     const stationdata = this.state.stationdata;
-    if (null !== stationdata) {
-      moment.locale('nb');
-      const name = stationdata[0].Name;
-      const airCcomponent = stationdata[0].TimeSeries[0].Component;
-      const dataType = stationdata[0].TimeSeries[0].DataType;
-      const airComponentValue = stationdata[0].TimeSeries[0].Measurments[0].Value;
-      const dateTimeFrom = moment(stationdata[0].TimeSeries[0].Measurments[0].DateTimeFrom).fromNow();
-      const dateTimeTo = moment(stationdata[0].TimeSeries[0].Measurments[0].DateTimeTo).fromNow();
+    const type = this.state.type;
 
-      const level = _.pickBy(pollutionLevels[airCcomponent], (levelObj)=> {
-        return levelObj.levelStart < airComponentValue && levelObj.levelEnd > airComponentValue
+    if (null !== stationdata) {
+
+      const selectedData = _.pickBy(stationdata.measurments, (data)=> {
+        return data.type === type
       });
+      moment.locale('nb');
+      const name = stationdata.name;
+      const airComponentUnit = selectedData[0].unit;
+      const airComponentDescription = pollutionLevels.descriptions[selectedData[0].type].title;
+      const airComponentMax = pollutionLevels.descriptions[selectedData[0].type].max;
+      const airComponentValue = selectedData[0].value;
+      const airComponentTrend = selectedData[0].trend;
+      const dateTimeTo = moment(selectedData[0].to, 'YYYYMMDDhhmm').fromNow();
+
+      const levelObject = _.pickBy(pollutionLevels[selectedData[0].type], (levelObj)=> {
+        return levelObj.levelStart < airComponentValue && levelObj.levelEnd > airComponentValue;
+      });
+
+      const trendText = () => {
+        const trend = airComponentTrend;
+        if (trend > 0) {
+          return 'stigende'
+        } else if (trend < 0) {
+          return 'synkende'
+        } else {
+          return ''
+        }
+      };
 
       return (
         <div className="row">
-          <span>{name} - {dateTimeTo}</span>
+          <div>smog</div>
+          <div>luftforurensningsnivået der du er!</div>
+          <div className="location-name">{name} - {dateTimeTo}</div>
+          <Gauge name={name} value={airComponentValue} trend={airComponentTrend}/>
           <br/>
-          <span>{airCcomponent}: {airComponentValue}</span>
-          <span className={`colorBlock ${level[0].color}`}>&nbsp;</span>
+          <div>{airComponentDescription}: {Math.round(airComponentValue)} {airComponentUnit} ({trendText()})</div>
           <br/>
-          <Gauge name={name} value={airComponentValue}/>
+          <div>maxverdi: {airComponentMax}</div>
+
+          {this.renderIcon(levelObject[0].icon)}
+
         </div>
       )
     } else {
       return (
-        <span>ikkeno her</span>
+        <Loader/>
       )
     }
   }
 
   render() {
     const geolocation = this.state.geolocation;
-
-    if (null !== geolocation) {
-      const lat = geolocation.coords.latitude;
-      const long = geolocation.coords.longitude;
-      if (null !== this.state.geolocation) {
-        //TODO sjekk på at tjenesten svarer i API
-        return (
-          <div>
-            <span>lokasjon-lat: {lat}</span><br/>
-            <span>lokasjon-long: {long}</span><br/>
-            <div id="map"></div>
-            <br/>
-            <br/>
-            {this.renderData()}
-
-
-          </div>
-        )
-      }
+    if (null !== geolocation && null !== this.state.geolocation) {
+      return this.renderData();
     } else {
       return (
         <Loader/>

@@ -1,6 +1,5 @@
 var path = require('path');
 var webpack = require('webpack');
-var SvgStore = require('webpack-svgstore-plugin');
 
 module.exports = {
   devtool: 'cheap-module-eval-source-map',
@@ -16,10 +15,7 @@ module.exports = {
   },
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
-    new webpack.NoErrorsPlugin(),
-    new SvgStore(path.join(__dirname, './node_modules/origo-design/images/icons/', '**/*.svg'), path.join('./'), {
-      name: 'icons.svg'
-    })
+    new webpack.NoErrorsPlugin()
   ],
   module: {
     loaders: [

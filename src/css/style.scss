@@ -1,8 +1,36 @@
-//// Dependencies
 @import '../components/loader/loader.scss';
-@import '../components/charts/gauge/gauge.scss';
+@import url('https://fonts.googleapis.com/css?family=Roboto');
+
+$baseFontSize: 16;
+$baseFontColor: white;
+$green: #1abc9c;
+$yellow: #f1c40f;
+$red: #c0392b;
+$blue: #3498db;
+$grey: #f2f2f2;
+$bacgground: rgb(254, 197, 79);
+
+@function rem($val) {
+  @return #{$val / $baseFontSize}rem;
+}
+
+html,body, #app{
+  height:100%;
+}
+
+#app{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
 
 body {
+  background-color: $bacgground;
+  color: $baseFontColor;
+  font-size: #{$baseFontSize};
+  font-family: "Roboto", sans-serif;
 
   &.green {
     background-color: green;
@@ -20,12 +48,140 @@ body {
     background-color: red;
   }
 
-  font-size: 12pt;
-  font-family: "Ethica Book";
-
   .row {
     display: flex;
+    flex-direction: column;
     align-items: center;
   }
 }
+
+.content {
+  display: flex;
+}
+
+// Gauge
+
+.box {
+  position: relative;
+  .material-icons {
+    position: absolute;
+    z-index: 9999;
+    bottom: 0;
+    margin-left: calc(50% - 26px);
+    left: auto;
+    right: auto;
+  }
+}
+
+.mask {
+  position: relative;
+  overflow: hidden;
+
+  display: block;
+  width: rem(200);
+  height: rem(100);
+  margin: rem(20);
+}
+
+.semi-circle {
+  position: relative;
+
+  display: block;
+  width: rem(200);
+  height: rem(100);
+
+  background: linear-gradient(to right, green 0%, $yellow 50%, $red 100%);
+
+  border-radius: 50% 50% 50% 50% / 100% 100% 0% 0%;
+
+  &::before {
+    content: "";
+
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    z-index: 2;
+
+    display: block;
+    width: rem(140);
+    height: rem(70);
+    margin-left: rem(-70);
+
+    background: $bacgground;
+
+    border-radius: 50% 50% 50% 50% / 100% 100% 0% 0%;
+  }
+}
+
+.semi-circle--mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  width: rem(200);
+  height: rem(200);
+
+  background: transparent;
+
+  transform: rotate(120deg) translate3d(0, 0, 0);
+  transform-origin: center center;
+  backface-visibility: hidden;
+  transition: all .3s ease-in-out;
+
+  &::before {
+    content: "";
+
+    position: absolute;
+    top: 0;
+    left: 0%;
+    z-index: 2;
+
+    display: block;
+    width: rem(202);
+    height: rem(102);
+    margin: -1px 0 0 -1px;
+
+    background: #f2f2f2;
+
+    border-radius: 50% 50% 50% 50% / 100% 100% 0% 0%;
+  }
+}
+
+/* Rules for sizing the icon. */
+.material-icons.md-18 {
+  font-size: 18px;
+}
+
+.material-icons.md-24 {
+  font-size: 24px;
+}
+
+.material-icons.md-36 {
+  font-size: 36px;
+}
+
+.material-icons.md-48 {
+  font-size: 48px;
+}
+
+/* Rules for using icons as black on a light background. */
+.material-icons.md-dark {
+  color: rgba(0, 0, 0, 0.54);
+}
+
+.material-icons.md-dark.md-inactive {
+  color: rgba(0, 0, 0, 0.26);
+}
+
+/* Rules for using icons as white on a dark background. */
+.material-icons.md-light {
+  color: rgba(255, 255, 255, 1);
+}
+
+.material-icons.md-light.md-inactive {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+
+
 
