@@ -231,10 +231,6 @@ class App extends Component {
         return data.type === type
       });
 
-      console.log('-selectedData)--------------------------------->');
-      console.log(selectedData);
-      console.log('<----------------------------------');
-
       moment.locale('nb');
       const name = stationdata.name;
       const airComponentUnit = selectedData[0].unit;
@@ -261,6 +257,7 @@ class App extends Component {
 
       return (
         <div className="row">
+
           <div className="app-name">smog</div>
           <div className="app-splash">luftforurensningsnivået der du er!</div>
           <br/>
