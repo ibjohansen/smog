@@ -11,9 +11,13 @@ class Gauge extends Component {
 
   componentDidMount() {
     const {value} = this.props;
-    const percentage = value * (100 / 400);
+    const percentage = (value * 100) / 400;
+    const percentageOfHalfcircle = (percentage * 180) / 100;
+
+    console.log('percentage');
+    console.log(percentageOfHalfcircle);
     setTimeout(() => {
-      this.setState({percentage})
+      this.setState({percentage:percentageOfHalfcircle})
     }, 500);
   }
 
