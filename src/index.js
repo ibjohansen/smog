@@ -9,7 +9,7 @@ import Menu from './components/menu';
 import classNames from 'classnames';
 //google api key for google maps
 //const MAP_API_KEY = 'AIzaSyAoJnCZd4rGip98-aGDRX0prads8v3R9Qw';
-const apiurl = process.env.NODE_ENV === 'development' ? 'http://localhost:5555/' : 'http://smog-api.herokuapp.com/';
+const apiurl = process.env.NODE_ENV === 'development' ? 'http://localhost:5555/' : 'https://smog-api.herokuapp.com/';
 
 const pollutionLevels = {
   descriptions: {
