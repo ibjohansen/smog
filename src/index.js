@@ -6,7 +6,8 @@ import Loader from './components/loader';
 import moment from 'moment';
 import Gauge from './components/charts/gauge';
 import Menu from './components/menu';
-
+import classNames from 'classnames';
+//google api key for google maps
 //const MAP_API_KEY = 'AIzaSyAoJnCZd4rGip98-aGDRX0prads8v3R9Qw';
 
 const pollutionLevels = {
@@ -14,7 +15,16 @@ const pollutionLevels = {
     NO2: {
       title: 'Nitrogendioksid',
       max: '400'
+    },
+    "PM2.5": {
+      title: 'Svevestøv/partikler',
+      max: '150'
+    },
+    PM10: {
+      title: 'Svevestøv/partikler',
+      max: '400'
     }
+
   },
   NO2: [
     {
@@ -150,10 +160,10 @@ class App extends Component {
     this.handleSetType = this.handleSetType.bind(this);
 
     this.state = {
-      username: '',
       geolocation: null,
       stationdata: null,
-      type: 'NO2'
+      type: 'NO2',
+      error: ''
     }
   }
 
@@ -195,22 +205,6 @@ class App extends Component {
     });
   };
 
-  handleValueChangeFromInput(key, e) {
-    this.handleValueChange(key, e.target.value)
-  }
-
-  handleValueChange(key, value) {
-    const state = this.state;
-    _.set(state, key, value);
-    this.setState(state)
-  }
-
-  handleUrlKeyPress(e) {
-    if (e.charCode === 13 && e.target.value) {
-      this.sendMessage();
-    }
-  }
-
   handleSetType(e) {
     const type = e.target.getAttribute('data-type');
     this.setState({type});
@@ -222,37 +216,68 @@ class App extends Component {
     )
   }
 
+  renderError() {
+    return (
+      <span>{this.state.error}</span>
+    )
+  }
+
   onSelectStation(station) {
-    console.log("this.state-geolocation", this.state.stationdata, station)
     this.setState({stationdata: station})
+  }
+
+  mapMeasurements(measurementsArray) {
+    let measurementsObject = {};
+    measurementsArray.forEach((mo)=> {
+      measurementsObject[mo.type] = mo;
+    });
+    return measurementsObject;
   }
 
   renderData() {
     moment.locale('nb');
     const stationdata = this.state.stationdata;
-    var type = this.state.type;
+    let type = this.state.type;
 
-    if (null !== stationdata) {
+    if (stationdata) {
 
-      let selectedData = _.pickBy(stationdata.measurments, (data)=> {
-        return data.type === type
-      });
+      let measurementsObject = this.mapMeasurements(stationdata.measurments);
+      let selectedData = measurementsObject[type];
+
       if (_.isEmpty(selectedData)) {
+        console.log('HUFFAMEI');
+        this.renderError('finner ikke data på stasjonen');
         selectedData = [stationdata.measurments[0]];
         type = selectedData.type;
+      } else {
+        this.renderError('');
       }
-      moment.locale('nb');
-      console.log("selectedData", this.state.stationdata, selectedData, type);
-      const name = stationdata.name;
-      const airComponentUnit = selectedData[0].unit;
-      const airComponentDescription = pollutionLevels.descriptions[selectedData[0].type].title;
-      const airComponentMax = pollutionLevels.descriptions[selectedData[0].type].max;
-      const airComponentValue = selectedData[0].value;
-      const airComponentTrend = selectedData[0].trend;
-      const dateTimeTo = moment(selectedData[0].to, 'YYYYMMDDhhmm').fromNow();
 
-      const levelObject = _.pickBy(pollutionLevels[selectedData[0].type], (levelObj)=> {
-        return levelObj.levelStart < airComponentValue && levelObj.levelEnd > airComponentValue;
+      moment.locale('nb');
+      const name = stationdata.name;
+      const airComponentUnit = selectedData.unit;
+      const airComponentDescription = pollutionLevels.descriptions[selectedData.type].title;
+      const airComponentMax = pollutionLevels.descriptions[selectedData.type].max;
+      const airComponentValue = selectedData.value;
+      const airComponentTrend = selectedData.trend;
+      const dateTimeTo = moment(selectedData.to, 'YYYYMMDDhhmm').fromNow();
+
+      let hasNO2 = false;
+      let hasPM2 = false;
+      let hasPM10 = false;
+
+      _(stationdata.measurments).forEach(function (o) {
+        if (o.type === 'NO2') {
+          hasNO2 = true;
+        } else if (o.type === 'PM2.5') {
+          hasPM2 = true;
+        } else if (o.type === 'PM10') {
+          hasPM10 = true;
+        }
+      });
+
+      const levelObject = _.pickBy(pollutionLevels[selectedData.type], (levelObj)=> {
+        return Object.assign({}, levelObj.levelStart < airComponentValue && levelObj.levelEnd > airComponentValue);
       });
 
       const trendText = () => {
@@ -265,6 +290,9 @@ class App extends Component {
           return ''
         }
       };
+      const btnClassesNO2 = classNames('button', 'raised', {hidden: !hasNO2});
+      const btnClassesPM2 = classNames('button', 'raised', {hidden: !hasPM2});
+      const btnClassesPM10 = classNames('button', 'raised', {hidden: !hasPM10});
 
       return (
         <div className="row">
@@ -280,20 +308,23 @@ class App extends Component {
           <div>maxverdi: {airComponentMax}</div>
 
           {this.renderIcon(levelObject[0].icon)}
+          {this.renderError()}
+
 
           <br/>
           <div className="btn-bar">
 
-            <div className="button raised" disabled={type==='NO2'} onClick={this.handleSetType} data-type="NO2">
-              <div className="center">NO2</div>
+
+            <div className={btnClassesNO2} onClick={this.handleSetType} data-type="NO2">
+              <div className="center" data-type="NO2">NO2</div>
             </div>
 
-            <div className="button raised" disabled={type==='PM2.5'} onClick={this.handleSetType} data-type="PM2.5">
-              <div className="center">PM2,5</div>
+            <div className={btnClassesPM2} onClick={this.handleSetType} data-type="PM2.5">
+              <div className="center" data-type="PM2.5">PM2,5</div>
             </div>
 
-            <div className="button raised" disabled={type==='PM10'} onClick={this.handleSetType} data-type="PM10">
-              <div className="center">PM10</div>
+            <div className={btnClassesPM10} onClick={this.handleSetType} data-type="PM10">
+              <div className="center" data-type="PM10">PM10</div>
             </div>
           </div>
 
@@ -304,12 +335,6 @@ class App extends Component {
         <Loader/>
       )
     }
-  }
-
-  renderLoaderOnly() {
-    return (
-      <Loader/>
-    )
   }
 
   render() {

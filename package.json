@@ -1,7 +1,7 @@
 {
-  "name": "embeddebale-chat",
+  "name": "smog",
   "version": "0.0.1",
-  "description": "embeddable chat for NRK apps",
+  "description": "smog-app, giving you pollution levels in Oslo",
   "main": "index.js",
   "scripts": {
     "test": "npm run test:unit",
@@ -15,7 +15,7 @@
     "build": "npm run clean && npm run build:webpack && npm run copy:dist",
     "lint": "eslint src"
   },
-  "license": "NRK",
+  "license": "Acando",
   "devDependencies": {
     "babel-core": "^6.3.15",
     "babel-eslint": "^5.0.0-beta4",

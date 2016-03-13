@@ -39,13 +39,15 @@ class Menu extends Component {
 
   render() {
     var _this = this;
-    let stations = this.state.stations.map(function(e) {
+    let stations = this.state.stations.map(function (e) {
       return (<li onClick={_this.selectStation.bind(_this, e)} key={e.id}>{e.name}</li>);
     });
 
     return (
       <div className="menu">
-        <button className={this.state.open ? "c-hamburger c-hamburger--htx is-active"  : "c-hamburger c-hamburger--htx" } onClick={this.toggleMenu.bind(this)}>
+        <button
+          className={this.state.open ? "c-hamburger c-hamburger--htx is-active"  : "c-hamburger c-hamburger--htx" }
+          onClick={this.toggleMenu.bind(this)}>
           <span>toggle menu</span>
         </button>
         <div className={this.state.open ? "menuContainer visible" : "menuContainer"}>

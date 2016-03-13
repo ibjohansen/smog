@@ -163,6 +163,8 @@ body {
   display: flex;
   flex-direction: row;
   width:100%;
+  align-content: center;
+  justify-content: center;
 }
 
 /* Rules for sizing the icon. */
@@ -215,6 +217,9 @@ body {
   margin-left:2px;
 }
 
+.button.hidden {
+  display: none;
+}
 .button.raised {
   transition: box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   transition-delay: 0.2s;
