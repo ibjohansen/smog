@@ -25,5 +25,5 @@ app.listen(3000, 'localhost', function (err) {
     return;
   }
 
-  console.log('smog-client listening at http://localhost:3000');
+  console.log('smog-app listening at http://localhost:3000');
 });

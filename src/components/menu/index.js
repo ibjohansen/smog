@@ -17,9 +17,9 @@ class Menu extends Component {
   }
 
   loadStations() {
-    const url = `http://localhost:5555/allStationData`;
+    const {url} = this.props;
     request
-      .get(url)
+      .get(`${url}allStationData`)
       .end((err, res) => {
         const stations = res.body;
         var loadedStations = [];

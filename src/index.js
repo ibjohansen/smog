@@ -9,6 +9,7 @@ import Menu from './components/menu';
 import classNames from 'classnames';
 //google api key for google maps
 //const MAP_API_KEY = 'AIzaSyAoJnCZd4rGip98-aGDRX0prads8v3R9Qw';
+const apiurl = process.env.NODE_ENV === 'development' ? 'http://localhost:5555/' : 'http://smog-api.herokuapp.com/';
 
 const pollutionLevels = {
   descriptions: {
@@ -193,7 +194,7 @@ class App extends Component {
       const loc = this.state.geolocation;
       const lat = loc.coords.latitude;
       const long = loc.coords.longitude;
-      const url = `http://localhost:5555/stationdata/${lat}/${long}`;
+      const url = `${apiurl}stationdata/${lat}/${long}`;
       request
         .get(url)
         .end((err, res) => {
@@ -211,6 +212,9 @@ class App extends Component {
   }
 
   renderIcon(iconString) {
+    console.log('---------------------------------->');
+    console.log(iconString);
+    console.log('<----------------------------------');
     return (
       <i className="material-icons md-48 md-light">{iconString}</i>
     )
@@ -276,6 +280,7 @@ class App extends Component {
         }
       });
 
+      //TODO pick is not working
       const levelObject = _.pickBy(pollutionLevels[selectedData.type], (levelObj)=> {
         return Object.assign({}, levelObj.levelStart < airComponentValue && levelObj.levelEnd > airComponentValue);
       });
@@ -296,7 +301,7 @@ class App extends Component {
 
       return (
         <div className="row">
-          <Menu onSelectStation={this.onSelectStation}/>
+          <Menu onSelectStation={this.onSelectStation} url={apiurl}/>
           <div className="app-name">smog</div>
           <div className="app-splash">luftforurensningsnivået der du er!</div>
           <br/>
@@ -306,6 +311,7 @@ class App extends Component {
           <div>{airComponentDescription}: {Math.round(airComponentValue)} {airComponentUnit} ({trendText()})</div>
           <br/>
           <div>maxverdi: {airComponentMax}</div>
+
 
           {this.renderIcon(levelObject[0].icon)}
           {this.renderError()}
