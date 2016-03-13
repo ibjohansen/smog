@@ -5,6 +5,7 @@ import request from 'superagent';
 import Loader from './components/loader';
 import moment from 'moment';
 import Gauge from './components/charts/gauge';
+import Menu from './components/menu';
 
 //const MAP_API_KEY = 'AIzaSyAoJnCZd4rGip98-aGDRX0prads8v3R9Qw';
 
@@ -145,6 +146,7 @@ class App extends Component {
     super(props);
 
     this.handleGetLocationData = this.handleGetLocationData.bind(this);
+    this.onSelectStation = this.onSelectStation.bind(this);
     this.handleSetType = this.handleSetType.bind(this);
 
     this.state = {
@@ -220,18 +222,27 @@ class App extends Component {
     )
   }
 
+  onSelectStation(station) {
+    console.log("this.state-geolocation", this.state.stationdata, station)
+    this.setState({stationdata: station})
+  }
+
   renderData() {
     moment.locale('nb');
     const stationdata = this.state.stationdata;
-    const type = this.state.type;
+    var type = this.state.type;
 
     if (null !== stationdata) {
 
-      const selectedData = _.pickBy(stationdata.measurments, (data)=> {
+      let selectedData = _.pickBy(stationdata.measurments, (data)=> {
         return data.type === type
       });
-
+      if (_.isEmpty(selectedData)) {
+        selectedData = [stationdata.measurments[0]];
+        type = selectedData.type;
+      }
       moment.locale('nb');
+      console.log("selectedData", this.state.stationdata, selectedData, type);
       const name = stationdata.name;
       const airComponentUnit = selectedData[0].unit;
       const airComponentDescription = pollutionLevels.descriptions[selectedData[0].type].title;
@@ -257,7 +268,7 @@ class App extends Component {
 
       return (
         <div className="row">
-
+          <Menu onSelectStation={this.onSelectStation}/>
           <div className="app-name">smog</div>
           <div className="app-splash">luftforurensningsnivået der du er!</div>
           <br/>
