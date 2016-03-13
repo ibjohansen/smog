@@ -24,9 +24,6 @@ if (process.env.NODE_ENV !== 'development') {
       regExp: /\.js$|\.html$/,
       threshold: 10240,
       minRatio: 0.8
-    }),
-    new SvgStore(path.join(__dirname, './node_modules/origo-design/images/icons/', '**/*.svg'), path.join('./'), {
-      name: 'icons.svg'
     })
   );
 }
