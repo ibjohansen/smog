@@ -210,9 +210,6 @@ class App extends Component {
   }
 
   renderIcon(iconString) {
-    console.log('---------------------------------->');
-    console.log(iconString);
-    console.log('<----------------------------------');
     return (
       <i className="material-icons md-48 md-light">{iconString}</i>
     )
@@ -278,9 +275,8 @@ class App extends Component {
         }
       });
 
-      //TODO pick is not working
-      const levelObject = _.pickBy(pollutionLevels[selectedData.type], (levelObj)=> {
-        return Object.assign({}, levelObj.levelStart < airComponentValue && levelObj.levelEnd > airComponentValue);
+      const levelObject = _.find(pollutionLevels[selectedData.type], (levelObj)=> {
+        return levelObj.levelStart < airComponentValue && levelObj.levelEnd > airComponentValue;
       });
 
       const trendText = () => {
@@ -311,7 +307,7 @@ class App extends Component {
           <div>maxverdi: {airComponentMax}</div>
 
 
-          {this.renderIcon(levelObject[0].icon)}
+          {this.renderIcon(levelObject.icon)}
           {this.renderError()}
 
 
