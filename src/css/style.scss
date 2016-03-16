@@ -79,7 +79,7 @@ body {
     position: absolute;
     z-index: 9999;
     bottom: 0;
-    margin-left: calc(50% - 26px);
+    margin-left: calc(50% - 60px);
     left: auto;
     right: auto;
   }
@@ -90,17 +90,17 @@ body {
   overflow: hidden;
 
   display: block;
-  width: rem(200);
-  height: rem(100);
-  margin: rem(20);
+  width: rem(400);
+  height: rem(200);
+  margin: rem(40);
 }
 
 .semi-circle {
   position: relative;
 
   display: block;
-  width: rem(200);
-  height: rem(100);
+  width: rem(400);
+  height: rem(200);
 
   background: linear-gradient(to right, green 0%, $yellow 50%, $red 100%);
 
@@ -115,9 +115,9 @@ body {
     z-index: 2;
 
     display: block;
-    width: rem(140);
-    height: rem(70);
-    margin-left: rem(-70);
+    width: rem(280);
+    height: rem(140);
+    margin-left: rem(-140);
 
     background: $bacgground;
 
@@ -130,8 +130,8 @@ body {
   top: 0;
   left: 0;
 
-  width: rem(200);
-  height: rem(200);
+  width: rem(400);
+  height: rem(400);
 
   background: transparent;
 
@@ -149,8 +149,8 @@ body {
     z-index: 2;
 
     display: block;
-    width: rem(202);
-    height: rem(102);
+    width: rem(404);
+    height: rem(204);
     margin: -1px 0 0 -1px;
 
     background: #f2f2f2;
@@ -182,6 +182,10 @@ body {
 
 .material-icons.md-48 {
   font-size: 48px;
+}
+
+.material-icons.md-120 {
+  font-size: 120px;
 }
 
 /* Rules for using icons as black on a light background. */

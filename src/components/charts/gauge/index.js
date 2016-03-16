@@ -33,9 +33,9 @@ class Gauge extends Component {
   renderTrendIcon() {
     const trend = this.props.trend;
     if (trend > 0) {
-      return <i className="material-icons md-48 md-light">arrow_upward</i>
+      return <i className="material-icons md-120 md-light">arrow_upward</i>
     } else if (trend < 0) {
-      return <i className="material-icons md-48 md-light">arrow_downward</i>
+      return <i className="material-icons md-120 md-light">arrow_downward</i>
     } else {
       return <span />
     }

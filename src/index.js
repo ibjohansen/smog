@@ -8,156 +8,15 @@ import Gauge from './components/charts/gauge';
 import Menu from './components/menu';
 import classNames from 'classnames';
 const apiurl = process.env.NODE_ENV === 'development' ? 'http://localhost:5555/' : 'https://smog-api.herokuapp.com/';
+import pollutionLevelModel from 'pollutionLevelModel';
 
-const pollutionLevels = {
-  descriptions: {
-    NO2: {
-      title: 'Nitrogendioksid',
-      max: '400'
-    },
-    "PM2.5": {
-      title: 'Svevestøv/partikler',
-      max: '150'
-    },
-    PM10: {
-      title: 'Svevestøv/partikler',
-      max: '400'
-    }
-
-  },
-  NO2: [
-    {
-      levelStart: 0,
-      levelEnd: 99,
-      description: 'Nitrogendioksid',
-      title: 'Lite',
-      health: 'Liten eller ingen helserisiko',
-      color: 'green',
-      icon: 'sentiment_satisfied'
-    },
-    {
-      levelStart: 100,
-      levelEnd: 199,
-      description: 'Nitrogendioksid',
-      title: 'Moderat',
-      health: 'Moderat helserisiko',
-      color: 'yellow',
-      icon: 'sentiment_neutral'
-    },
-
-    {
-      levelStart: 200,
-      levelEnd: 399,
-      description: 'Nitrogendioksid',
-      title: 'Høyt',
-      health: 'Betydelig helserisiko',
-      color: 'orange',
-      icon: 'sentiment_dissatisfied'
-    },
-
-    {
-      levelStart: 400,
-      levelEnd: 1000,
-      description: 'Nitrogendioksid',
-      title: 'Svært høyt',
-      health: 'Alvorlig helserisiko',
-      color: 'red',
-      icon: 'sentiment_very_dissatisfied'
-    }
-  ],
-
-  "PM2.5": [
-    {
-      levelStart: 0,
-      levelEnd: 24,
-      description: 'Svevestøv/partikler',
-      title: 'Lite',
-      health: 'Liten eller ingen helserisiko',
-      color: 'green',
-      icon: 'sentiment_satisfied'
-    },
-    {
-      levelStart: 25,
-      levelEnd: 39,
-      description: 'Svevestøv/partikler',
-      title: 'Moderat',
-      health: 'Moderat helserisiko',
-      color: 'yellow',
-      icon: 'sentiment_neutral'
-    },
-
-    {
-      levelStart: 40,
-      levelEnd: 149,
-      description: 'Svevestøv/partikler',
-      title: 'Høyt',
-      health: 'Betydelig helserisiko',
-      color: 'orange',
-      icon: 'sentiment_dissatisfied'
-    },
-
-    {
-      levelStart: 150,
-      levelEnd: 1000,
-      description: 'Svevestøv/partikler',
-      title: 'Svært høyt',
-      health: 'Alvorlig helserisiko',
-      color: 'red',
-      icon: 'sentiment_very_dissatisfied'
-    }
-  ],
-
-  PM10: [
-    {
-      levelStart: 0,
-      levelEnd: 24,
-      description: 'Svevestøv/partikler',
-      title: 'Lite',
-      health: 'Liten eller ingen helserisiko',
-      color: 'green',
-      icon: 'sentiment_satisfied'
-    },
-    {
-      levelStart: 25,
-      levelEnd: 39,
-      description: 'Svevestøv/partikler',
-      title: 'Moderat',
-      health: 'Moderat helserisiko',
-      color: 'yellow',
-      icon: 'sentiment_neutral'
-    },
-
-    {
-      levelStart: 40,
-      levelEnd: 149,
-      description: 'Svevestøv/partikler',
-      title: 'Høyt',
-      health: 'Betydelig helserisiko',
-      color: 'orange',
-      icon: 'sentiment_dissatisfied'
-    },
-
-    {
-      levelStart: 150,
-      levelEnd: 1000,
-      description: 'Svevestøv/partikler',
-      title: 'Svært høyt',
-      health: 'Alvorlig helserisiko',
-      color: 'red',
-      icon: 'sentiment_very_dissatisfied'
-    }
-  ]
-};
-
-
+const pollutionslevels = pollutionLevelModel();
 class App extends Component {
   constructor(props) {
     super(props);
-
     this.handleGetLocationData = this.handleGetLocationData.bind(this);
     this.onSelectStation = this.onSelectStation.bind(this);
     this.handleSetType = this.handleSetType.bind(this);
-
     this.state = {
       geolocation: null,
       stationdata: null,
@@ -188,7 +47,7 @@ class App extends Component {
   };
 
   handleGetLocationData() {
-    return new Promise((resolve, reject) => {
+    return new Promise(() => {
       const loc = this.state.geolocation;
       const lat = loc.coords.latitude;
       const long = loc.coords.longitude;
@@ -196,7 +55,11 @@ class App extends Component {
       request
         .get(url)
         .end((err, res) => {
-          this.setState({stationdata: res.body})
+          this.setState(
+            {
+              stationdata: res.body,
+              type: res.body.measurments[0].type
+            })
 
         }, (err)=> {
           console.log(err);
@@ -210,15 +73,7 @@ class App extends Component {
   }
 
   renderIcon(iconString) {
-    return (
-      <i className="material-icons md-48 md-light">{iconString}</i>
-    )
-  }
-
-  renderError() {
-    return (
-      <span>{this.state.error}</span>
-    )
+    return <i className="material-icons md-48 md-light">{iconString}</i>
   }
 
   onSelectStation(station) {
@@ -234,22 +89,16 @@ class App extends Component {
   }
 
   renderData() {
-    moment.locale('nb');
     const stationdata = this.state.stationdata;
     let type = this.state.type;
 
     if (stationdata) {
-
       let measurementsObject = this.mapMeasurements(stationdata.measurments);
       let selectedData = measurementsObject[type];
 
       if (_.isEmpty(selectedData)) {
         console.log('HUFFAMEI');
-        this.renderError('finner ikke data på stasjonen');
         selectedData = [stationdata.measurments[0]];
-        type = selectedData.type;
-      } else {
-        this.renderError('');
       }
 
       moment.locale('nb');
@@ -275,9 +124,10 @@ class App extends Component {
         }
       });
 
-      const levelObject = _.find(pollutionLevels[selectedData.type], (levelObj)=> {
+      const levelObject = _.find(pollutionLevels.descriptions[selectedData.type].levels, (levelObj)=> {
         return levelObj.levelStart < airComponentValue && levelObj.levelEnd > airComponentValue;
       });
+      const airComponentHealthImpact = levelObject.health;
 
       const trendText = () => {
         const trend = airComponentTrend;
@@ -306,15 +156,11 @@ class App extends Component {
           <br/>
           <div>maxverdi: {airComponentMax}</div>
 
-
           {this.renderIcon(levelObject.icon)}
-          {this.renderError()}
-
+          <div>{airComponentHealthImpact}</div>
 
           <br/>
           <div className="btn-bar">
-
-
             <div className={btnClassesNO2} onClick={this.handleSetType} data-type="NO2">
               <div className="center" data-type="NO2">NO2</div>
             </div>
@@ -351,4 +197,6 @@ class App extends Component {
 }
 
 render(
-  <App />, document.getElementById('app'));
+  <App />,
+  document.getElementById('app')
+);
