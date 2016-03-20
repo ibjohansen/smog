@@ -21,7 +21,6 @@ export default () => {
             color: 'yellow',
             icon: 'sentiment_neutral'
           },
-
           {
             levelStart: 200,
             levelEnd: 399,
@@ -30,7 +29,6 @@ export default () => {
             color: 'orange',
             icon: 'sentiment_dissatisfied'
           },
-
           {
             levelStart: 400,
             levelEnd: 1000,
@@ -61,7 +59,6 @@ export default () => {
             color: 'yellow',
             icon: 'sentiment_neutral'
           },
-
           {
             levelStart: 40,
             levelEnd: 149,
@@ -70,7 +67,6 @@ export default () => {
             color: 'orange',
             icon: 'sentiment_dissatisfied'
           },
-
           {
             levelStart: 150,
             levelEnd: 1000,
@@ -101,7 +97,6 @@ export default () => {
             color: 'yellow',
             icon: 'sentiment_neutral'
           },
-
           {
             levelStart: 40,
             levelEnd: 149,
@@ -110,7 +105,6 @@ export default () => {
             color: 'orange',
             icon: 'sentiment_dissatisfied'
           },
-
           {
             levelStart: 150,
             levelEnd: 1000,

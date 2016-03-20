@@ -8,9 +8,10 @@ import Gauge from './components/charts/gauge';
 import Menu from './components/menu';
 import classNames from 'classnames';
 const apiurl = process.env.NODE_ENV === 'development' ? 'http://localhost:5555/' : 'https://smog-api.herokuapp.com/';
-import pollutionLevelModel from 'pollutionLevelModel';
+import pollutionLevelModel from './pollutionLevelModel';
 
-const pollutionslevels = pollutionLevelModel();
+const pollutionLevels = pollutionLevelModel();
+
 class App extends Component {
   constructor(props) {
     super(props);
@@ -90,6 +91,7 @@ class App extends Component {
 
   renderData() {
     const stationdata = this.state.stationdata;
+
     let type = this.state.type;
 
     if (stationdata) {
@@ -100,6 +102,14 @@ class App extends Component {
         console.log('HUFFAMEI');
         selectedData = [stationdata.measurments[0]];
       }
+
+
+      console.log('-levels--------------------------------->');
+      console.log(pollutionLevels);
+      console.log('---');
+      console.log('selectedData.type');
+      console.log(selectedData.type);
+      console.log('<----------------------------------');
 
       moment.locale('nb');
       const name = stationdata.name;
@@ -184,6 +194,10 @@ class App extends Component {
   }
 
   render() {
+
+
+
+
     const geolocation = this.state.geolocation;
     if (null !== geolocation && null !== this.state.geolocation) {
       return this.renderData();
